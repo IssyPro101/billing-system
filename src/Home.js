@@ -1,7 +1,9 @@
+import Menu from "./components/Menu/Menu";
+
 function Home() {
   return (
     <div>
-      <p>Home</p>
+      <Menu/>
     </div>
 
   );
