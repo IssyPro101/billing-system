@@ -1,10 +1,10 @@
 import User from "./components/User/User";
 import Login from "./components/Login/Login";
 
-function Profile({user}) {
+function Profile({user, setUser}) {
   return (
     <div>
-      {user ? <User/> : <Login/>}
+      {user ? <User setUser={setUser}/> : <Login setUser={setUser}/>}
     </div>
 
   );

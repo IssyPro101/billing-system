@@ -11,11 +11,11 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const userObject = localStorage.getItem('items');
-    if (userObject) {
-      setUser(userObject)
-    }
+    const userObject = localStorage.getItem('user');
+    setUser(userObject)
   }, [])
+
+  
 
   return (
     <div>
@@ -23,7 +23,7 @@ function App() {
       <Router>
         <Routes>
           <Route exact path='/' element={<Home user={user}/>} />
-          <Route exact path='/profile' element={<Profile user={user}/>} />
+          <Route exact path='/profile' element={<Profile user={user} setUser={setUser}/>} />
           <Route path='*' element={<NotFound />} />
         </Routes>
       </Router>

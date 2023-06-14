@@ -1,9 +1,9 @@
 import Menu from "./components/Menu/Menu";
 
-function Home() {
+function Home({user}) {
   return (
     <div>
-      <Menu/>
+      <Menu user={user}/>
     </div>
 
   );

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import './Login.css';
 
-const LoginPage = () => {
+const LoginPage = ({setUser}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -15,7 +16,21 @@ const LoginPage = () => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission logic here
+    if (email && password) {
+        axios
+        .post('http://localhost:3001/api/create', {
+            email,
+            password
+        })
+        .then((response) => {
+            console.log(response.data.user)
+            localStorage.setItem('user', response.data.user.id);
+            setUser(response.data.user.id.toString());
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   return (

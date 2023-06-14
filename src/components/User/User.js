@@ -1,7 +1,7 @@
 import React from 'react';
 import './User.css';
 
-const User = () => {
+const User = ({setUser}) => {
   const user = {
     fullName: 'John Doe',
     username: 'johndoe',
@@ -12,6 +12,11 @@ const User = () => {
       { item: 'Item 2', date: '2023-06-05' },
       { item: 'Item 3', date: '2023-06-10' },
     ],
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
   };
 
   return (
@@ -41,6 +46,9 @@ const User = () => {
             </div>
           ))}
         </div>
+        <button className="logout-button" onClick={handleLogout}>
+          Logout
+        </button>
       </div>
     </div>
   );
