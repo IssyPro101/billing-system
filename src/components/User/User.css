@@ -2,8 +2,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background-color: #f1f1f1;
+    margin: 50px;
 }
 
 .profile-container {
@@ -31,8 +30,17 @@
     background-color: #f9f9f9;
 }
 
+.order-history {
+    overflow: scroll;
+    height: 250px;
+}
+
 .order-item-name {
     font-weight: bold;
+}
+
+.order-item-price {
+    font-size: 13px;
 }
 
 .order-item-date {

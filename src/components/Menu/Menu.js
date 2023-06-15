@@ -2,38 +2,85 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Menu.css';
 import { useNavigate } from "react-router-dom";
+import { useCallback } from 'react';
 
-const Menu = ({user}) => {
+const Menu = ({ user }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [funds, setFunds] = useState(100);
+  const [funds, setFunds] = useState(null);
+  const [discount, setDiscount] = useState(null);
+  const [pointsPerOrder, setPointsPerOrder] = useState(null);
+  const [actionMessage, setActionMessage] = useState(null)
+
   const navigate = useNavigate();
 
-  useEffect(() => {
-    axios
-      .get('http://localhost:3001/api/menu/items')
-      .then((response) => {
-        setMenuItems(response.data.items);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const getUserInfo = useCallback(async () => {
+    try {
+      const userFunds = await axios.get(`http://localhost:3001/api/funds/${user}`)
+      const discount = await axios.get(`http://localhost:3001/api/discount/${user}`)
+      setFunds(userFunds.data.funds);
+      setDiscount(discount.data.discount);
+    } catch (error) {
+      console.error(error)
+    }
+  }, [user]);
 
-      
-      
+  useEffect(() => {
+
+    if (user) {
+      getUserInfo();
+    }
+
+  }, [user, getUserInfo]);
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const items = await axios.get('http://localhost:3001/api/menu/items');
+        const points = await axios.get('http://localhost:3001/api/order/points');
+        setMenuItems(items.data.items);
+        setPointsPerOrder(points.data.points);
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    getData();
   }, []);
 
   const handleBuy = (item) => {
     setSelectedItem(item);
   };
 
-  const handleConfirmPurchase = (shippingAddress) => {
-    // Process the purchase logic here
-    console.log('Purchase confirmed:', selectedItem.name);
-    console.log('Shipping Address:', shippingAddress);
+  const displayMessage = (text, itemName) => {
+    setActionMessage({
+      text: text,
+      itemName: itemName
+    })
+    setTimeout(() => {
+      setActionMessage(null)
+    }, 2000)
+  }
+
+  const handleConfirmPurchase = async () => {
     // Deduct item price from funds
-    setFunds(funds - selectedItem.price);
+    try {
+      await axios.post(
+        'http://localhost:3001/api/order/create',
+        {
+          userId: user,
+          item: selectedItem
+        }
+      );
+      getUserInfo();
+      displayMessage("Purchase successful!", selectedItem.name)
+
+    } catch (error) {
+      displayMessage(error.response.data.error, selectedItem.name)
+      console.error(error)
+    }
+
     setSelectedItem(null); // Clear selected item and close the modal
+
   };
 
   const handleCloseModal = () => {
@@ -42,19 +89,23 @@ const Menu = ({user}) => {
 
   return (
     <div className="menu-container">
-      {menuItems.map((item) => (
-        <div key={item.id} className="menu-item">
-          <div className="item-name">{item.name}</div>
-          <div className="item-description">{item.description}</div>
-          <div className="item-price">${item.price}</div>
-          {user ? <button className="buy-button" onClick={() => handleBuy(item)}>
-            Buy
-          </button> : <button className="buy-button" onClick={() => navigate("/profile")}>
-            Login to Buy
-          </button>}
 
-        </div>
-      ))}
+      {menuItems.map((item, key) => {
+        console.log(item)
+        return (
+          <div key={key} className="menu-item">
+            <div className="item-name">{item.name}</div>
+            <div className="item-description">{item.description}</div>
+            <div className="item-price">${item.price}</div>
+            {user ? <button className="buy-button" onClick={() => handleBuy(item)} disabled={actionMessage || funds < item.price ? true : false}>
+              {(actionMessage && item.name === actionMessage.itemName) && actionMessage.text}
+              {!(actionMessage && item.name === actionMessage.itemName) && funds >= item.price && "Buy"}
+              {!(actionMessage && item.name === actionMessage.itemName) && funds < item.price && "Insufficient funds"}
+            </button> : <button className="buy-button" onClick={() => navigate("/profile")}>
+              Login to Buy
+            </button>}
+          </div>)
+      })}
 
       {selectedItem && (
         <div className="confirm-overlay">
@@ -65,23 +116,39 @@ const Menu = ({user}) => {
                 &times;
               </button>
             </div>
+
+            <div style={{ margin: "0 auto", marginBottom: "20px" }} className="menu-item">
+              <div className="item-name">{selectedItem.name}</div>
+              <div className="item-description">{selectedItem.description}</div>
+              {discount && discount > 0 ? <div className="item-price"><s>${selectedItem.price}</s></div> : <div className="item-price">${selectedItem.price}</div>}
+              {discount > 0 && <div className="item-price">${(selectedItem.price - selectedItem.price * discount / 100)}</div>}
+            </div>
+
             <div className="confirm-body">
+              {discount > 0 && <p>
+                Discount: {discount}% off
+              </p>}
               <p>
                 Current funds: ${funds}
               </p>
               <p>
-                Funds after purchase: ${funds - selectedItem.price}
+                Funds after purchase: ${funds - (selectedItem.price - (discount && discount > 0 ? (selectedItem.price * discount / 100) : 0))}
               </p>
-              <label htmlFor="shipping-address">Shipping Address:</label>
-              <input type="text" id="shipping-address" />
+              <p>
+                You receive: {pointsPerOrder} points
+              </p>
             </div>
             <div className="confirm-footer">
-              <button
+              {funds ? <button
                 className="confirm-button"
-                onClick={() => handleConfirmPurchase(document.getElementById('shipping-address').value)}
+                onClick={handleConfirmPurchase}
               >
                 Confirm Purchase
-              </button>
+              </button> : <button
+                className="confirm-button"
+              >
+                Loading Funds...
+              </button>}
             </div>
           </div>
         </div>

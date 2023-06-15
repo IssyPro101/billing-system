@@ -4,7 +4,7 @@ import Login from "./components/Login/Login";
 function Profile({user, setUser}) {
   return (
     <div>
-      {user ? <User setUser={setUser}/> : <Login setUser={setUser}/>}
+      {user ? <User user={user} setUser={setUser}/> : <Login setUser={setUser}/>}
     </div>
 
   );

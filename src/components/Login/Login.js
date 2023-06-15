@@ -14,22 +14,21 @@ const LoginPage = ({setUser}) => {
     setPassword(e.target.value);
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (email && password) {
-        axios
-        .post('http://localhost:3001/api/create', {
+      try {
+        // Send request to login or signup
+        const response = await axios.post('http://localhost:3001/api/create', {
             email,
             password
         })
-        .then((response) => {
-            console.log(response.data.user)
-            localStorage.setItem('user', response.data.user.id);
-            setUser(response.data.user.id.toString());
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+        localStorage.setItem('user', response.data.user.id);
+        setUser(response.data.user.id.toString());
+      } catch (error) {
+        console.error(error)
+      }
+
     }
   };
 

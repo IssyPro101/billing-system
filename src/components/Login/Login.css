@@ -2,8 +2,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-
+    margin: 150px;
 }
 
 .login-form {
