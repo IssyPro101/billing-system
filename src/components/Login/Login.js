@@ -5,6 +5,7 @@ import './Login.css';
 const LoginPage = ({setUser}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [actionMessage, setActionMessage] = useState(null)
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -27,10 +28,21 @@ const LoginPage = ({setUser}) => {
         setUser(response.data.user.id.toString());
       } catch (error) {
         console.error(error)
+        displayMessage(error.response.data.error, "red")
       }
 
     }
   };
+
+  const displayMessage = (text, color) => {
+    setActionMessage({
+      text: text,
+      color: color
+    })
+    setTimeout(() => {
+      setActionMessage(null)
+    }, 750)
+  }
 
   return (
     <div className="login-page">
@@ -49,6 +61,7 @@ const LoginPage = ({setUser}) => {
           onChange={handlePasswordChange}
         />
         <button type="submit">Submit</button>
+        {actionMessage && <p className="message" style={{color: actionMessage.color}}>{actionMessage.text}</p>}
       </form>
     </div>
   );

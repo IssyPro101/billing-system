@@ -55,7 +55,7 @@ const User = ({ user, setUser }) => {
     })
     setTimeout(() => {
       setActionMessage(null)
-    }, 5000)
+    }, 750)
   }
 
   const addFunds = async () => {
@@ -83,7 +83,7 @@ const User = ({ user, setUser }) => {
             <strong>Email:</strong> {userInfo && userInfo.email}
           </div>
           <div>
-            <strong>Funds:</strong> ${userInfo && userInfo.funds}
+            <strong>Funds:</strong> ${userInfo && userInfo.funds.toFixed(2)}
           </div>
           <div>
             <strong>Points:</strong> {userInfo && userInfo.points}

@@ -9,7 +9,7 @@
     background-color: #f0f0f0;
     border-radius: 5px;
     padding: 20px;
-    width: 300px;
+    width: 275px;
 }
 
 .item-name {
@@ -103,4 +103,9 @@
     margin-top: 10px;
     border-radius: 4px;
     border: 1px solid #ccc;
+}
+
+.heading {
+    margin-left: 20px;
+    margin-top: 10px;
 }
