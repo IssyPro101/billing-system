@@ -5,21 +5,43 @@ import { useNavigate } from "react-router-dom";
 import { useCallback } from 'react';
 
 const Menu = ({ user }) => {
-  const [menuItems, setMenuItems] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [funds, setFunds] = useState(null);
-  const [discount, setDiscount] = useState(null);
-  const [pointsPerOrder, setPointsPerOrder] = useState(null);
   const [actionMessage, setActionMessage] = useState(null)
 
-  const navigate = useNavigate();
+  const [funds, setFunds] = useState(null);
+  const [points, setPoints] = useState(null);
 
+  const [pointsPerOrder, setPointsPerOrder] = useState(null);
+  const [menuItems, setMenuItems] = useState(null);
+  const [requiredPoints, setRequiredPoints] = useState(null)
+
+  const [discount, setDiscount] = useState(null);
+
+
+  const navigate = useNavigate();
+  console.log(discount)
+
+  useEffect(() => {
+    const loadItems = async () => {
+      const items = await axios.get('http://localhost:3001/api/menu/items');
+      const points = await axios.get('http://localhost:3001/api/order/points');
+      const requiredPoints = await axios.get('http://localhost:3001/api/requiredPoints');
+
+      setMenuItems(items.data.items);
+      setPointsPerOrder(points.data.points);
+      setRequiredPoints(requiredPoints.data.requiredPoints);
+    }
+    loadItems();
+  }, [])
+  
   const getUserInfo = useCallback(async () => {
     try {
       const userFunds = await axios.get(`http://localhost:3001/api/funds/${user}`)
-      const discount = await axios.get(`http://localhost:3001/api/discount/${user}`)
+      const userPoints = await axios.get(`http://localhost:3001/api/points/${user}`)
+
       setFunds(userFunds.data.funds);
-      setDiscount(discount.data.discount);
+      setPoints(userPoints.data.points);
+
     } catch (error) {
       console.error(error)
     }
@@ -32,22 +54,6 @@ const Menu = ({ user }) => {
     }
 
   }, [user, getUserInfo]);
-
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const items = await axios.get('http://localhost:3001/api/menu/items');
-        const points = await axios.get('http://localhost:3001/api/order/points');
-        console.log(items.data.items)
-        setMenuItems(items.data.items);
-
-        setPointsPerOrder(points.data.points);
-      } catch (error) {
-        console.error(error)
-      }
-    }
-    getData();
-  }, []);
 
   const handleBuy = (item) => {
     setSelectedItem(item);
@@ -70,7 +76,8 @@ const Menu = ({ user }) => {
         'http://localhost:3001/api/order/create',
         {
           userId: user,
-          item: selectedItem
+          item: selectedItem,
+          discount: discount
         }
       );
       getUserInfo();
@@ -82,11 +89,13 @@ const Menu = ({ user }) => {
     }
 
     setSelectedItem(null); // Clear selected item and close the modal
+    setDiscount(null);
 
   };
 
   const handleCloseModal = () => {
     setSelectedItem(null); // Clear selected item and close the modal
+    setDiscount(null);
   };
 
   return (
@@ -94,7 +103,6 @@ const Menu = ({ user }) => {
       <h2 className="heading">Drinks</h2>
       <div className="menu-container">
         {menuItems && menuItems["drinks"].map((item, key) => {
-          console.log(item)
           return (
             <div key={key} className="menu-item">
               <div className="item-name">{item.name}</div>
@@ -113,7 +121,6 @@ const Menu = ({ user }) => {
       <h2 className="heading">Food</h2>
       <div className="menu-container">
         {menuItems && menuItems["food"].map((item, key) => {
-            console.log(item)
             return (
               <div key={key} className="menu-item">
                 <div className="item-name">{item.name}</div>
@@ -132,7 +139,6 @@ const Menu = ({ user }) => {
       <h2 className="heading">Dessert</h2>
       <div className="menu-container">
         {menuItems && menuItems["dessert"].map((item, key) => {
-            console.log(item)
             return (
               <div key={key} className="menu-item">
                 <div className="item-name">{item.name}</div>
@@ -148,8 +154,6 @@ const Menu = ({ user }) => {
               </div>)
           })}
       </div>
-
-
 
       {
         selectedItem && (
@@ -173,6 +177,9 @@ const Menu = ({ user }) => {
                 {discount > 0 && <p>
                   Discount: {discount}% off
                 </p>}
+                {points >= 10 && <button className="discount-button" style={{backgroundColor: discount === 5 ? "#93c7ff" : "#007bff"}} onClick={discount !== 5 ? () => setDiscount(5) : () => setDiscount(null)}>{discount === 5 ? "5% discount applied." : "Apply 5% discount"}</button>}
+                {points >= 20 && <button className="discount-button" style={{backgroundColor: discount === 10 ? "#93c7ff" : "#007bff"}} onClick={discount !== 10 ? () => setDiscount(10) : () => setDiscount(null)}>{discount === 10 ? "10% discount applied." : "Apply 10% discount"}</button>}
+                {points >= 50 && <button className="discount-button" style={{backgroundColor: discount === 20 ? "#93c7ff" : "#007bff"}} onClick={discount !== 20 ? () => setDiscount(20) : () => setDiscount(null)}>{discount === 20 ? "20% discount applied." : "Apply 20% discount"}</button>}
                 <p>
                   Current funds: ${funds.toFixed(2)}
                 </p>
@@ -180,7 +187,10 @@ const Menu = ({ user }) => {
                   Funds after purchase: ${(funds - (selectedItem.price - (discount && discount > 0 ? (selectedItem.price * discount / 100) : 0))).toFixed(2)}
                 </p>
                 <p>
-                  You receive: {pointsPerOrder} points
+                  Current points: {points} points
+                </p>
+                <p>
+                  Points after purchase: {!discount ? points + pointsPerOrder : points - requiredPoints[discount]} points
                 </p>
               </div>
               <div className="confirm-footer">

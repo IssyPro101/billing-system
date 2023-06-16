@@ -15,17 +15,13 @@ const User = ({ user, setUser }) => {
       const userBase = await axios.get(`http://localhost:3001/api/getFromId/${user}`)
       const userPoints = await axios.get(`http://localhost:3001/api/points/${user}`)
       const userFunds = await axios.get(`http://localhost:3001/api/funds/${user}`)
-      const userDiscount = await axios.get(`http://localhost:3001/api/discount/${user}`)
       const userOrders = await axios.get(`http://localhost:3001/api/order/${user}`)
-
-      console.log(userOrders.data.userOrders)
 
       const userInfo = {
         email: userBase.data.user.email,
         funds: userFunds.data.funds,
         orderHistory: userOrders.data.userOrders,
         points: userPoints.data.points,
-        discount: userDiscount.data.discount
       };
 
       setUserInfo(userInfo)
@@ -87,9 +83,6 @@ const User = ({ user, setUser }) => {
           </div>
           <div>
             <strong>Points:</strong> {userInfo && userInfo.points}
-          </div>
-          <div>
-            <strong>Discount:</strong> {userInfo && (userInfo.discount === 0 ? "Not eligible for discount." : `${userInfo.discount}% off every order.`)}
           </div>
         </div>
         <h2>Order History</h2>
