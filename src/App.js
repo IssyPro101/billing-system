@@ -12,6 +12,7 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+
     // Get user ID from local storage
     const userObject = localStorage.getItem('user');
     setUser(userObject)
