@@ -13,8 +13,8 @@ const Menu = ({ user }) => {
   // State variables
   const [selectedItem, setSelectedItem] = useState(null);
   const [actionMessage, setActionMessage] = useState(null);
-  const [funds, setFunds] = useState(null);
-  const [points, setPoints] = useState(null);
+  const [userFunds, setUserFunds] = useState(null);
+  const [userPoints, setUserPoints] = useState(null);
   const [pointsPerOrder, setPointsPerOrder] = useState(null);
   const [menuItems, setMenuItems] = useState(null);
   const [requiredPoints, setRequiredPoints] = useState(null);
@@ -43,8 +43,8 @@ const Menu = ({ user }) => {
       const userFunds = await axios.get(`${process.env.REACT_APP_API_URL}/api/funds/${user}`);
       const userPoints = await axios.get(`${process.env.REACT_APP_API_URL}/api/points/${user}`);
 
-      setFunds(userFunds.data.funds);
-      setPoints(userPoints.data.points);
+      setUserFunds(userFunds.data.funds);
+      setUserPoints(userPoints.data.points);
     } catch (error) {
       console.error(error);
     }
@@ -129,12 +129,12 @@ const Menu = ({ user }) => {
                 <button
                   className="buy-button"
                   onClick={() => handleBuy(item)}
-                  disabled={actionMessage || funds < item.price}
-                  style={{ backgroundColor: actionMessage || funds < item.price ? "#93c7ff" : "#007bff" }}
+                  disabled={actionMessage || userFunds < item.price}
+                  style={{ backgroundColor: actionMessage || userFunds < item.price ? "#93c7ff" : "#007bff" }}
                 >
                   {(actionMessage && item.name === actionMessage.itemName) && actionMessage.text}
-                  {!(actionMessage && item.name === actionMessage.itemName) && funds >= item.price && "Buy"}
-                  {!(actionMessage && item.name === actionMessage.itemName) && funds < item.price && "Insufficient funds"}
+                  {!(actionMessage && item.name === actionMessage.itemName) && userFunds >= item.price && "Buy"}
+                  {!(actionMessage && item.name === actionMessage.itemName) && userFunds < item.price && "Insufficient funds"}
                 </button>
               ) : (
                 <button className="buy-button" onClick={() => navigate("/profile")}>
@@ -157,12 +157,12 @@ const Menu = ({ user }) => {
                 <button
                   className="buy-button"
                   onClick={() => handleBuy(item)}
-                  disabled={actionMessage || funds < item.price}
-                  style={{ backgroundColor: actionMessage || funds < item.price ? "#93c7ff" : "#007bff" }}
+                  disabled={actionMessage || userFunds < item.price}
+                  style={{ backgroundColor: actionMessage || userFunds < item.price ? "#93c7ff" : "#007bff" }}
                 >
                   {(actionMessage && item.name === actionMessage.itemName) && actionMessage.text}
-                  {!(actionMessage && item.name === actionMessage.itemName) && funds >= item.price && "Buy"}
-                  {!(actionMessage && item.name === actionMessage.itemName) && funds < item.price && "Insufficient funds"}
+                  {!(actionMessage && item.name === actionMessage.itemName) && userFunds >= item.price && "Buy"}
+                  {!(actionMessage && item.name === actionMessage.itemName) && userFunds < item.price && "Insufficient funds"}
                 </button>
               ) : (
                 <button className="buy-button" onClick={() => navigate("/profile")}>
@@ -185,12 +185,12 @@ const Menu = ({ user }) => {
                 <button
                   className="buy-button"
                   onClick={() => handleBuy(item)}
-                  disabled={actionMessage || funds < item.price}
-                  style={{ backgroundColor: actionMessage || funds < item.price ? "#93c7ff" : "#007bff" }}
+                  disabled={actionMessage || userFunds < item.price}
+                  style={{ backgroundColor: actionMessage || userFunds < item.price ? "#93c7ff" : "#007bff" }}
                 >
                   {(actionMessage && item.name === actionMessage.itemName) && actionMessage.text}
-                  {!(actionMessage && item.name === actionMessage.itemName) && funds >= item.price && "Buy"}
-                  {!(actionMessage && item.name === actionMessage.itemName) && funds < item.price && "Insufficient funds"}
+                  {!(actionMessage && item.name === actionMessage.itemName) && userFunds >= item.price && "Buy"}
+                  {!(actionMessage && item.name === actionMessage.itemName) && userFunds < item.price && "Insufficient funds"}
                 </button>
               ) : (
                 <button className="buy-button" onClick={() => navigate("/profile")}>
@@ -225,7 +225,7 @@ const Menu = ({ user }) => {
 
             <div className="confirm-body">
               {discount > 0 && <p>Discount: {discount}% off</p>}
-              {points >= 10 && (
+              {userPoints >= 10 && (
                 <button
                   className="discount-button"
                   style={{ backgroundColor: discount === 5 ? "#93c7ff" : "#007bff" }}
@@ -234,7 +234,7 @@ const Menu = ({ user }) => {
                   {discount === 5 ? "5% discount applied." : "Apply 5% discount"}
                 </button>
               )}
-              {points >= 20 && (
+              {userPoints >= 20 && (
                 <button
                   className="discount-button"
                   style={{ backgroundColor: discount === 10 ? "#93c7ff" : "#007bff" }}
@@ -243,7 +243,7 @@ const Menu = ({ user }) => {
                   {discount === 10 ? "10% discount applied." : "Apply 10% discount"}
                 </button>
               )}
-              {points >= 50 && (
+              {userPoints >= 50 && (
                 <button
                   className="discount-button"
                   style={{ backgroundColor: discount === 20 ? "#93c7ff" : "#007bff" }}
@@ -252,13 +252,13 @@ const Menu = ({ user }) => {
                   {discount === 20 ? "20% discount applied." : "Apply 20% discount"}
                 </button>
               )}
-              <p>Current funds: ${funds.toFixed(2)}</p>
-              <p>Funds after purchase: ${(funds - (selectedItem.price - (discount && discount > 0 ? (selectedItem.price * discount / 100) : 0))).toFixed(2)}</p>
-              <p>Current points: {points} points</p>
-              <p>Points after purchase: {!discount ? points + pointsPerOrder : points - requiredPoints[discount]} points</p>
+              <p>Current funds: ${userFunds.toFixed(2)}</p>
+              <p>Funds after purchase: ${(userFunds - (selectedItem.price - (discount && discount > 0 ? (selectedItem.price * discount / 100) : 0))).toFixed(2)}</p>
+              <p>Current points: {userPoints} points</p>
+              <p>Points after purchase: {!discount ? userPoints + pointsPerOrder : userPoints - requiredPoints[discount]} points</p>
             </div>
             <div className="confirm-footer">
-              {funds ? (
+              {userFunds ? (
                 <button className="confirm-button" onClick={handleConfirmPurchase}>
                   Confirm Purchase
                 </button>

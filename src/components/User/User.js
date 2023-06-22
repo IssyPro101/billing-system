@@ -73,11 +73,11 @@ const User = ({ user, setUser }) => {
    */
   const addFunds = async () => {
     try {
-      await axios.put(`${process.env.REACT_APP_API_URL}/api/funds/${user}`, {
-        points: 100,
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/funds/${user}`, {
+        funds: 100,
       });
       requestUserInfo();
-      displayMessage("$100 funds added!", "green");
+      displayMessage(response.data.message, "green");
     } catch (error) {
       displayMessage(error.response.data.error, "red");
       console.error(error);
