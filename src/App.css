@@ -5,3 +5,17 @@
 .message {
     margin-top: 10px;
 }
+
+.main-heading {
+    text-align: center;
+}
+
+.heading {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.project-info {
+    margin: 0 auto;
+    text-align: center;
+}

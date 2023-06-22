@@ -35,6 +35,11 @@
     height: 250px;
 }
 
+.order-item-discount {
+    font-size: 12px;
+    color: #888;
+}
+
 .order-item-name {
     font-weight: bold;
 }

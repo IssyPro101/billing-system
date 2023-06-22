@@ -3,19 +3,26 @@ import './User.css';
 import { useEffect, useCallback } from 'react';
 import axios from "axios";
 
+/**
+ * User component displays user profile information and order history.
+ *
+ * @param {string} user - User ID.
+ * @param {function} setUser - Function to set the user state.
+ */
 const User = ({ user, setUser }) => {
-
+  // State variables
   const [userInfo, setUserInfo] = useState(null);
-  const [actionMessage, setActionMessage] = useState(null)
+  const [actionMessage, setActionMessage] = useState(null);
 
-
+  /**
+   * Requests user information from the API.
+   */
   const requestUserInfo = useCallback(async () => {
     try {
-
-      const userBase = await axios.get(`http://localhost:3001/api/getFromId/${user}`)
-      const userPoints = await axios.get(`http://localhost:3001/api/points/${user}`)
-      const userFunds = await axios.get(`http://localhost:3001/api/funds/${user}`)
-      const userOrders = await axios.get(`http://localhost:3001/api/order/${user}`)
+      const userBase = await axios.get(`${process.env.REACT_APP_API_URL}/api/getFromId/${user}`);
+      const userPoints = await axios.get(`${process.env.REACT_APP_API_URL}/api/points/${user}`);
+      const userFunds = await axios.get(`${process.env.REACT_APP_API_URL}/api/funds/${user}`);
+      const userOrders = await axios.get(`${process.env.REACT_APP_API_URL}/api/order/${user}`);
 
       const userInfo = {
         email: userBase.data.user.email,
@@ -24,50 +31,57 @@ const User = ({ user, setUser }) => {
         points: userPoints.data.points,
       };
 
-      setUserInfo(userInfo)
-
+      setUserInfo(userInfo);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }, [user])
+  }, [user]);
 
   useEffect(() => {
+    // Load user information if user is logged in
     if (user) {
       requestUserInfo();
     }
+  }, [user, requestUserInfo]);
 
-  }, [user, requestUserInfo])
-
-
+  /**
+   * Handles the logout action.
+   */
   const handleLogout = () => {
     localStorage.removeItem('user');
     setUser(null);
   };
 
+  /**
+   * Displays an action message temporarily.
+   *
+   * @param {string} text - The message text to display.
+   * @param {string} color - The color of the message.
+   */
   const displayMessage = (text, color) => {
     setActionMessage({
       text: text,
       color: color
-    })
+    });
     setTimeout(() => {
-      setActionMessage(null)
-    }, 750)
-  }
+      setActionMessage(null);
+    }, 750);
+  };
 
+  /**
+   * Adds funds to the user's account.
+   */
   const addFunds = async () => {
     try {
-      await axios.put(`http://localhost:3001/api/funds/${user}`, {
-        "points": 100,
-      })
-      requestUserInfo()
-      displayMessage("$100 funds added!", "green")
-
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/funds/${user}`, {
+        points: 100,
+      });
+      requestUserInfo();
+      displayMessage("$100 funds added!", "green");
     } catch (error) {
-
-      displayMessage(error.response.data.error, "red")
+      displayMessage(error.response.data.error, "red");
       console.error(error);
     }
-
   };
 
   return (
@@ -87,15 +101,22 @@ const User = ({ user, setUser }) => {
         </div>
         <h2>Order History</h2>
         <div className="order-history">
-          {userInfo && (userInfo.orderHistory.length === 0 ? <p>No order history found.</p> : userInfo.orderHistory.map((order, index) => (
-            <div key={index} className="order-item">
-              <div className="order-item-name">{order.item.name}</div>
-              <div className="order-item-price">${order.item.price}</div>
-              <div className="order-item-date">Order Date: {(new Date(order.date)).toLocaleDateString()}</div>
-            </div>
-          )))}
+          {userInfo && (userInfo.orderHistory.length === 0 ? (
+            <p>No order history found.</p>
+          ) : (
+            userInfo.orderHistory.map((order, index) => (
+              <div key={index} className="order-item">
+                {order.discount && (
+                  <div className="order-item-discount">{`${order.discount}% discount applied.`}</div>
+                )}
+                <div className="order-item-name">{order.item.name}</div>
+                <div className="order-item-price">${order.price}</div>
+                <div className="order-item-date">Order Date: {new Date(order.date).toLocaleDateString()}</div>
+              </div>
+            ))
+          ))}
         </div>
-        <br/>
+        <br />
         <button className="logout-button" onClick={handleLogout}>
           Logout
         </button>
@@ -103,7 +124,11 @@ const User = ({ user, setUser }) => {
         <button className="logout-button" onClick={addFunds}>
           Add 100+ Funds
         </button>
-        {actionMessage && <p className="message" style={{color: actionMessage.color}}>{actionMessage.text}</p>}
+        {actionMessage && (
+          <p className="message" style={{ color: actionMessage.color }}>
+            {actionMessage.text}
+          </p>
+        )}
       </div>
     </div>
   );

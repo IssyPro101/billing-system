@@ -12,6 +12,7 @@ function Navigation({user}) {
           <Nav className="me-auto">
             <Nav.Link href="/">Menu</Nav.Link>
             {user ? <Nav.Link href="/profile">Profile</Nav.Link> : <Nav.Link href="/profile">Login</Nav.Link>}
+            <Nav.Link href="/info">Project Info</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>
