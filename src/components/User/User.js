@@ -18,6 +18,7 @@ const User = ({ user, setUser }) => {
    * Requests user information from the API.
    */
   const requestUserInfo = useCallback(async () => {
+    console.log(user)
     try {
       const userBase = await axios.get(`${process.env.REACT_APP_API_URL}/api/getFromId/${user}`);
       const userPoints = await axios.get(`${process.env.REACT_APP_API_URL}/api/points/${user}`);
