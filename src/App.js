@@ -12,16 +12,16 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-
     // Get user ID from local storage
     const userObject = localStorage.getItem('user');
+    console.log(userObject)
     setUser(userObject)
   }, [])
 
   return (
     <div>
-      <Navigation user={user}/>
       <Router>
+        <Navigation user={user}/>
         <Routes>
           <Route exact path='/' element={<Home user={user}/>} />
           <Route exact path='/profile' element={<Profile user={user} setUser={setUser}/>} />
