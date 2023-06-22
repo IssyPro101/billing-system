@@ -90,18 +90,18 @@ const User = ({ user, setUser }) => {
         <h2>Profile</h2>
         <div className="user-info">
           <div>
-            <strong>Email:</strong> {userInfo && userInfo.email}
+            <strong>Email:</strong> {userInfo ? userInfo.email : "Loading..."}
           </div>
           <div>
-            <strong>Funds:</strong> ${userInfo && userInfo.funds.toFixed(2)}
+            <strong>Funds:</strong> {userInfo ? `$${userInfo.funds.toFixed(2)}` : "Loading..."}
           </div>
           <div>
-            <strong>Points:</strong> {userInfo && userInfo.points}
+            <strong>Points:</strong> {userInfo ? userInfo.points : "Loading..."}
           </div>
         </div>
         <h2>Order History</h2>
         <div className="order-history">
-          {userInfo && (userInfo.orderHistory.length === 0 ? (
+          {userInfo ? (userInfo.orderHistory.length === 0 ? (
             <p>No order history found.</p>
           ) : (
             userInfo.orderHistory.map((order, index) => (
@@ -114,7 +114,7 @@ const User = ({ user, setUser }) => {
                 <div className="order-item-date">Order Date: {new Date(order.date).toLocaleDateString()}</div>
               </div>
             ))
-          ))}
+          )) : "Loading..."}
         </div>
         <br />
         <button className="logout-button" onClick={handleLogout}>

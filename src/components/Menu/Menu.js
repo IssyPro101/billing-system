@@ -119,7 +119,7 @@ const Menu = ({ user }) => {
     <div>
       <h2 className="heading">Drinks</h2>
       <div className="menu-container">
-        {menuItems && menuItems["drinks"].map((item, key) => {
+        {menuItems ? menuItems["drinks"].map((item, key) => {
           return (
             <div key={key} className="menu-item">
               <div className="item-name">{item.name}</div>
@@ -143,11 +143,11 @@ const Menu = ({ user }) => {
               )}
             </div>
           );
-        })}
+        }) : <p style={{margin: "0 auto"}}>Loading...</p>}
       </div>
       <h2 className="heading">Food</h2>
       <div className="menu-container">
-        {menuItems && menuItems["food"].map((item, key) => {
+        {menuItems ? menuItems["food"].map((item, key) => {
           return (
             <div key={key} className="menu-item">
               <div className="item-name">{item.name}</div>
@@ -171,11 +171,11 @@ const Menu = ({ user }) => {
               )}
             </div>
           );
-        })}
+        }) : <p style={{margin: "0 auto"}}>Loading...</p>}
       </div>
       <h2 className="heading">Dessert</h2>
       <div className="menu-container">
-        {menuItems && menuItems["dessert"].map((item, key) => {
+        {menuItems ? menuItems["dessert"].map((item, key) => {
           return (
             <div key={key} className="menu-item">
               <div className="item-name">{item.name}</div>
@@ -199,7 +199,7 @@ const Menu = ({ user }) => {
               )}
             </div>
           );
-        })}
+        }) : <p style={{margin: "0 auto"}}>Loading...</p>}
       </div>
 
       {selectedItem && (
